@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace="hp.hp001_d007">
+	<insert id="insertFarm" parameterType="hashmap">
+		INSERT INTO farms
+		(
+			farm_no
+			,approval_cd <!-- 승인상태코드 -->
+			,farm_nm <!-- 농장명 -->
+			,POSTCODE <!-- 우편번호 -->
+			,farm_phone <!-- 농장주 연락처 -->
+			,farmer_id <!-- 농장주ID -->
+			,farmer_phone
+			,address
+			,application_date <!-- 신청일 -->
+			,land_org_file_name <!-- 토지_원본사진명 -->
+			,land_save_file_name <!-- 토지_저장사진명 -->
+			,land_file_size <!-- 토지_파일크기 -->
+			,garden_cnt
+			,farm_info
+			,org_file_name <!-- 토지_원본사진명 -->
+			,save_file_name <!-- 토지_저장사진명 -->
+			,file_size
+			,thumbnail_name
+			,area_size
+			,contract_term
+			,farmer_email
+		)
+		VALUES
+		(
+			farm_seq.nextval
+			,01
+			,#{farm_name}
+			,#{postcode}
+			,#{farm_phone}
+			,#{farmer_id}
+			,#{farmer_phone}
+			,#{address}
+			,SYSDATE <!-- 신청일 -->
+			,#{land_org_file_name} <!-- 토지_원본사진명 -->
+			,#{land_save_file_name} <!-- 토지_저장사진명 -->
+			,#{land_file_size} <!-- 토지_파일크기 -->
+			,#{garden_cnt}
+			,#{farm_info}
+			,#{org_file_name}
+			,#{save_file_name}
+			,#{file_size}
+			,#{thumbnail_name}
+			,#{area_size}
+			,#{contract_term}
+			,#{farmer_email}
+		)
+	</insert>
+	
+	<select id="selectFarmApply" parameterType="String" resultType="Hashmap">
+		SELECT
+			TO_CHAR(APPLICATION_DATE, 'yyyy-mm-dd') AS APPLICATION_DATE
+			,FARM_NM
+			,APPROVAL_CD
+			,FARM_NO
+		FROM FARMS
+		WHERE FARMER_ID = #{farmer_id}
+	</select>
+	
+	<select id="selectFarmInfo" parameterType="String" resultType="Hashmap">
+		SELECT
+			(SELECT USER_NM FROM USERS WHERE USER_ID = F.FARMER_ID) AS FARMER_NAME
+			,FARMER_PHONE
+			,FARMER_EMAIL
+			,(SELECT CODE_NM FROM STANDARD_CODE WHERE GROUP_ID = 014 AND CODE_ID = F.CONTRACT_TERM) AS CONTRACT_TERM
+			,FARM_NM
+			,FARM_PHONE
+			,ADDRESS
+			,GARDEN_CNT
+			,FARM_INFO
+			,LAND_SAVE_FILE_NAME
+		FROM FARMS F
+		WHERE FARM_NO = #{farm_no}
+	</select>
+</mapper>

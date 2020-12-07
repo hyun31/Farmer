@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="hp001_d004">
+
+	<select id ="getBoardList" 
+	
+	resultType="project.hp.hp001_d004.vo.Hp001_d004VO">
+<!-- 			SELECT  -->
+<!-- 			article_no, board_cd, writer_id, board_gr_cd, article_nm, article_content, reg_date, chg_date,read_cnt,is_notice,farm_no,EMAIL,ORDER_NUMBER,QUESTION_TYPE -->
+<!--       	FROM  -->
+<!--       		ARTICLES -->
+      	
+<!--       	order by article_no desc -->
+      	
+<!--       	SELECT * -->
+<!--       FROM (SELECT ROWNUM AS RNUM, a.* -->
+<!--       FROM (SELECT article_no, board_cd, writer_id, board_gr_cd, article_nm, article_content, reg_date, chg_date,read_cnt,is_notice, -->
+<!--       EMAIL,ORDER_NUMBER,QUESTION_TYPE -->
+<!--       FROM ARTICLES ORDER BY ARTICLE_NO DESC) a) -->
+<!--          WHERE RNUM BETWEEN #{startList} AND  #{startList} + #{listSize} -1 -->
+<!--            AND board_cd = 09 -->
+       
+        SELECT *
+    		FROM  
+   		 (     
+         SELECT ROWNUM AS RNUM, a.*
+         FROM 
+         (SELECT article_no, board_cd, writer_id, board_gr_cd, article_nm, article_content, reg_date, chg_date,read_cnt,is_notice,
+      	 EMAIL,PHONE
+      	 FROM ARTICLES 
+         WHERE board_cd = '09'
+         ORDER BY ARTICLE_NO DESC
+         ) a
+    ) b
+	 WHERE RNUM BETWEEN #{startList} AND  #{startList} + #{listSize} -1
+      	
+      	
+	</select>
+	
+<!-- 	parameterType="project.hp.hp001_d002.common.Pagination" -->
+	
+	
+	<!-- 페이징 처리 후 게시글 조회 -->
+	<select id="getBoardListCnt" resultType="int">
+		SELECT 
+			count(*) as listCnt
+		FROM
+			ARTICLES
+	</select>
+	
+	<select id ="getBoardContent" resultType="project.hp.hp001_d004.vo.Hp001_d004VO">
+		SELECT 
+			article_no,board_cd,article_content,read_cnt,writer_id,reg_date,chg_date,email,order_number,question_type
+      	FROM 
+      		ARTICLES
+      	WHERE
+      		article_no = #{article_no}
+	</select>
+	
+	<insert id="insertBoard" parameterType="project.hp.hp001_d004.vo.Hp001_d004VO">
+			<selectKey resultType="int" keyProperty="article_no" order="BEFORE">
+				SELECT  NVL(MAX(article_no),0)+1 FROM ARTICLES
+			</selectKey>
+			INSERT INTO ARTICLES (ARTICLE_NO,BOARD_CD,BOARD_GR_CD,WRITER_ID,QUESTION_TYPE,ORDER_NUMBER,EMAIL,ARTICLE_NM
+		,ARTICLE_CONTENT,READ_CNT,REG_DATE,CHG_DATE,IS_NOTICE)
+		VALUES(
+			 #{article_no}
+			,'09'
+			,'008'
+			,#{writer_id}
+			,#{question_type}
+			,#{order_number}
+			,#{email}
+			,#{article_nm}
+			,#{article_content}
+			,0
+			,sysdate
+			,sysdate
+			,0
+			
+		)		
+	</insert>
+	
+	<update id ="updateBoard" parameterType="project.hp.hp001_d004.vo.Hp001_d004VO">
+		UPDATE ARTICLES SET
+			 ARTICLE_NM = #{article_nm}
+			,ARTICLE_CONTENT = #{article_content}
+			,EMAIL = #{email}
+			,ORDER_NUMBER = #{order_number}
+			,QUESTION_TYPE = #{question_type}
+			,CHG_DATE = sysdate
+		WHERE
+			ARTICLE_NO = #{article_no}
+	</update>
+	
+	<delete id="deleteBoard" parameterType="int">
+		DELETE FROM ARTICLES
+		WHERE ARTICLE_NO = #{article_no}
+	</delete>
+	
+	<update id="updateViewCnt"
+	parameterType="project.hp.hp001_d004.vo.Hp001_d004VO">
+			UPDATE ARTICLES SET
+				READ_CNT = READ_CNT + 1
+			WHERE 
+				ARTICLE_NO = #{article_no}	
+	</update>
+</mapper>
+

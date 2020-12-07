@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+"-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+"http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+<tiles-definitions>
+   <definition name="layout"  template="/WEB-INF/views/common/layout.jsp">
+      <put-attribute name="title" value="" />
+      <put-attribute name="header" value="/WEB-INF/views/common/header3.jsp" />
+      <put-attribute name="body" value="" />
+      <put-attribute name="footer" value="/WEB-INF/views/common/footer2.jsp" />
+   </definition>
+   
+   <definition name="layout_sidebar"  template="/WEB-INF/views/common/layout_sidebar.jsp">
+      <put-attribute name="title" value="" />
+      <put-attribute name="header" value="/WEB-INF/views/common/header3.jsp" />
+      <put-attribute name="sidebar" value=""/>
+      <put-attribute name="body" value="" />
+      <put-attribute name="footer" value="/WEB-INF/views/common/footer2.jsp" />
+   </definition>
+   
+   <!-- <definition name="/main" extends="layout">
+      <put-attribute name="title" value="아임파머스" />
+      <put-attribute name="body" value="/WEB-INF/views/common/main.jsp" />
+   </definition> -->
+   
+   
+   <definition name="ap/*" extends="layout">
+      <put-attribute name="title" value="아임파머스" />
+      <put-attribute name="body" value="/WEB-INF/views/ap/{1}.jsp" />
+   </definition>
+   
+   <definition name="bp/*" extends="layout">
+      <put-attribute name="title" value="아임파머스" />
+      <put-attribute name="body" value="/WEB-INF/views/bp/{1}.jsp" />
+   </definition>
+   
+   <definition name="cp/*" extends="layout">
+      <put-attribute name="title" value="아임파머스" />
+      <put-attribute name="body" value="/WEB-INF/views/cp/{1}.jsp" />
+   </definition>
+   
+   <definition name="dp/*" extends="layout">
+      <put-attribute name="title" value="아임파머스" />
+      <put-attribute name="body" value="/WEB-INF/views/dp/{1}.jsp" />
+   </definition>
+   
+    <definition name="ep/*" extends="layout_sidebar">
+      <put-attribute name="title" value="아임파머스" />
+      <put-attribute name="sidebar" value="/WEB-INF/views/ep/ep_sidebar.jsp"/>
+      <put-attribute name="body" value="/WEB-INF/views/ep/{1}.jsp" />
+   </definition>
+   
+   <definition name="fp/*" extends="layout_sidebar">
+      <put-attribute name="title" value="아임파머스" />
+      <put-attribute name="sidebar" value="/WEB-INF/views/fp/fp_sidebar.jsp"/>
+      <put-attribute name="body" value="/WEB-INF/views/fp/{1}.jsp" />
+   </definition>
+   
+   <definition name="hp/*" extends="layout">
+      <put-attribute name="title" value="아임파머스" />
+      <put-attribute name="body" value="/WEB-INF/views/hp/{1}.jsp" />
+   </definition>
+   
+   <definition name="ip/*" extends="layout">
+      <put-attribute name="title" value="아임파머스" />
+      <put-attribute name="body" value="/WEB-INF/views/ip/{1}.jsp" />
+   </definition>
+   
+   
+   <!-- 어드민 타일즈 -->
+   <definition name="admin"  template="/WEB-INF/views/common/admin.jsp">
+	  <put-attribute name="content" value="" />
+   </definition>
+   
+   <definition name="kp/*" extends="admin">
+      <put-attribute name="content" value="/WEB-INF/views/kp/{1}.jsp" />
+   </definition>
+</tiles-definitions>

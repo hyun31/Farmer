@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace="if.standard_code">
+	<resultMap id="scResult01" type="standardcodeVO">
+		<result property="group_id" column="group_id"  />
+		<result property="code_id" column="code_id" />
+		<result property="code_nm" column="code_nm" />
+		<result property="code_order" column="code_order" />
+		<result property="useyn" column="useyn" />
+	</resultMap>
+
+	<select id="selectCode" resultMap="scResult01" parameterType="String">
+		<![CDATA[
+         select *
+         from standard_code
+         where group_id = #{p_group_id} and useyn = 'Y'
+         order by code_order
+      ]]>
+	</select>
+</mapper>

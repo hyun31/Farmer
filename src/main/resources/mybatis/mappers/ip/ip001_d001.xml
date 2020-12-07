@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace="ip.ip001_d001">
+	<!-- <resultMap id="ip001_d001Result01" type="ip001_d001VO">
+		<result property="farm_no" column="farm_no"  />
+		<result property="garden_no" column="garden_no" />
+		<result property="schedule_no" column="schedule_no" />
+		<result property="schedule_name" column="schedule_name" />
+		<result property="schedule_content" column="schedule_content" />
+		<result property="schedule_category" column="schedule_category" />
+		<result property="start_date" column="start_date" />
+		<result property="end_date" column="end_date" />
+	</resultMap> -->
+
+	<select id="showSchedule" resultType="ip001_d001VO">
+		<![CDATA[
+         select schedule_name, schedule_content, schedule_category, start_date, end_date
+         from   calendar
+         ]]>
+         <where>
+			<if test=" farm_no != ''  and farm_no != null and garden_no != '' and garden_no != null">
+				farm_no = #{farm_no} and garden_no = #{garden_no}
+			</if>
+		</where>
+      
+	</select>
+		
+	<insert id="addSchedule" parameterType="ip001_d001VO">
+  	  <![CDATA[
+         insert into calendar
+         values (#{farm_no}, #{garden_no}, schedule_seq.nextval, #{schedule_name}, #{schedule_content}, #{schedule_category}, 
+         		#{start_date}, TO_DATE(#{end_date}, 'yyyy-MM-dd HH24:MI:SS'))
+      ]]>
+	</insert>
+	
+	<select id="selectGardenFarmNo" resultType="ip001_d001VO" parameterType="hashmap">
+	  <![CDATA[
+         select garden_no, farm_no
+         from   gardens
+         where  farmer_id = #{USER_ID} or cust_id = #{USER_ID}
+      ]]>
+	</select>
+	
+</mapper>

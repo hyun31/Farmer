@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace="ep.ep001_d007">
+	<select id="selectSequence" resultType="String">
+		SELECT ORDER_SEQ.NEXTVAL
+		FROM DUAL
+	</select>
+	
+	<insert id="insertOrder" parameterType="Hashmap">
+		INSERT INTO ORDERS
+		(
+			ORDER_NO
+			,FARM_NO
+			,GARDEN_NO
+			,USER_ID
+			,USER_NM
+			,EMAIL
+			,PHONE
+			,ADDRESS
+			,ORDER_DATE
+			,ORDER_CODE
+			,STATUS_CODE
+			,CONTRACT_TERM
+			,HARVEST_TYPE
+		)
+		VALUES
+		(
+			#{partner_order_id}
+			,#{farm_no}
+			,#{garden_no}
+			,#{partner_user_id}
+			,#{user_nm}
+			,#{email}
+			,#{phone}
+			,#{address}
+			,SYSDATE
+			,#{order_code}
+			,'01'
+			,#{contract_term}
+			,#{harvest_type}
+		)
+	</insert>
+	
+	<update id="updateStatus" parameterType="String">
+		UPDATE ORDERS
+		SET STATUS_CODE = '02'
+		WHERE ORDER_NO = #{order_no}
+	</update>
+	
+	<select id="selectOrderInfo" resultType="Hashmap" parameterType="String">
+		SELECT
+			O.ORDER_NO
+			,O.FARM_NO
+			,O.GARDEN_NO
+			,O.USER_ID
+			,O.ORDER_DATE
+			,O.USER_NM
+			,(SELECT FARM_NM FROM FARMS F WHERE F.FARM_NO = O.FARM_NO) AS FARM_NM
+			,(SELECT GARDEN_NM FROM GARDENS G WHERE G.GARDEN_NO = O.GARDEN_NO AND G.FARM_NO = O.FARM_NO) AS GARDEN_NM
+			,O.CONTRACT_TERM
+			,TO_CHAR((SELECT TOTAL_PRICE FROM PAYMENTS P WHERE P.ORDER_NO = O.ORDER_NO), '999,999,999,999,999') AS TOTAL_PRICE
+			,O.EMAIL
+			,O.PHONE
+			,O.ADDRESS
+			,O.ORDER_CODE
+			,O.HARVEST_TYPE
+		FROM ORDERS O
+		WHERE O.ORDER_NO = #{order_no}
+	</select>
+	
+	<update id="updateGarden" parameterType="Hashmap">
+		UPDATE GARDENS
+		SET
+		    CUST_ID = #{USER_ID}
+		    ,IS_RENTAL = 'Y'
+		    ,RENTAL_TERM = #{CONTRACT_TERM}
+		    ,START_DATE = SYSDATE
+		    ,END_DATE = ADD_MONTHS(SYSDATE, #{CONTRACT_TERM})
+		WHERE
+		    FARM_NO = #{FARM_NO} AND
+		    GARDEN_NO = #{GARDEN_NO}
+	</update>
+	
+	<insert id="insertPayment" parameterType="Hashmap">
+		INSERT INTO PAYMENTS
+		(
+			ORDER_NO
+			,PAYMENT_DATE
+			,TOTAL_PRICE
+			,PAYMENT_TYPE_CD
+		)
+		VALUES
+		(
+			#{order_no}
+			,TO_DATE(#{order_date}, 'yyyy-mm-dd HH24:mi:ss')
+			,#{total_price}
+			,01
+		)
+	</insert>
+	
+	<update id="extensionGarden" parameterType="Hashmap">
+		UPDATE GARDENS
+		SET
+			END_DATE = ADD_MONTHS(END_DATE, #{CONTRACT_TERM})
+			,RENTAL_TERM = RENTAL_TERM + #{CONTRACT_TERM}
+		WHERE 
+			farm_no = #{FARM_NO} AND garden_no = #{GARDEN_NO}
+	</update>
+	
+	<insert id="insertOrderItem" parameterType="Hashmap">
+		INSERT INTO ORDERITEMS
+		VALUES
+		(
+			#{order_no}
+			,#{prod_gr_id}
+			,#{prod_no}
+			,#{prod_cnt}
+			,#{plant_type}
+			,#{farm_no}
+			,#{price}
+		)
+	</insert>
+	
+	<select id="selectItemInfo" parameterType="String" resultType="Hashmap">
+		SELECT
+			ROWNUM
+			,PROD_GR_ID
+			,(SELECT PROD_NAME FROM PRODUCTS WHERE PROD_TYPE_CD = O.PROD_GR_ID AND PROD_NO = O.PROD_NO) AS PROD_NAME
+			,PROD_CNT
+			,PLANT_TYPE
+			,PRICE
+		FROM ORDERITEMS O
+		WHERE ORDER_NO = #{order_no}
+	</select>
+</mapper>

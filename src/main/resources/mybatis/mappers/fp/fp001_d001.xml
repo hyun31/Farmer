@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="fp.fp001_d001">
+	<resultMap id="fp001_d001Result01" type="fp001_d001VO">
+		<result property="article_no" column="article_no" />
+		<result property="board_cd" column="board_cd" />
+		<result property="writer_id" column="writer_id" />
+		<result property="board_gr_cd" column="board_gr_cd" />
+		<result property="article_nm" column="article_nm" />
+		<result property="article_content" column="article_content" />
+		<result property="reg_date" column="reg_date" />
+		<result property="chg_date" column="chg_date" />
+		<result property="read_cnt" column="read_cnt" />
+		<result property="is_notice" column="is_notice" />
+		<result property="farm_no" column="farm_no" />
+	</resultMap>
+	
+	<!-- 총 게시물 수를 조회하는 쿼리 -->
+	<select id="countBoard" resultType="int">
+		SELECT count(*)
+		FROM articles
+	</select>
+	
+	<!-- 게시물 조회 -->
+	<select id="listArticles" resultType="fp001_d001VO" parameterType="PagingVO">
+	SELECT
+			AAA.*
+		FROM(
+			SELECT
+				COUNT(*) OVER() AS TOTAL_COUNT,
+				AA.*
+			FROM(
+				SELECT
+					ROW_NUMBER() OVER (ORDER BY article_no DESC) RNUM,
+					a.article_no
+					,u.user_nm
+					,a.article_nm
+					,a.article_content
+					,a.reg_date
+					,a.read_cnt
+					,a.board_cd
+					,a.local_no <!-- 지역 -->
+					,(SELECT SUBSTR(code_nm,1,2) FROM standard_code WHERE group_id = '016' AND code_id = a.board_cd) AS board_nm <!-- 게시판 목록 - 카테고리 부분 출력 -->
+					,(SELECT code_nm FROM standard_code WHERE group_id = '020' AND code_id = a.local_no) AS local_nm <!-- 게시판 목록 - 지역 부분 출력 -->
+				FROM
+					articles a
+				INNER JOIN
+					users u
+				ON
+					a.writer_id = u.user_id
+ 				WHERE
+					a.board_cd = #{board_cd}
+				ORDER BY
+					article_no DESC
+			) AA
+		) AAA
+		WHERE
+			AAA.RNUM BETWEEN #{start} AND #{end}
+			</select>
+			
+			<!-- count만하게 -->
+	<select id="listArticlesCount" parameterType="String" resultType="int" >
+			SELECT
+				COUNT(*) AS TOTAL
+			FROM(
+				SELECT
+					ROWNUM AS RN
+				FROM
+					articles a
+				INNER JOIN
+					users u
+				ON
+					a.writer_id = u.user_id
+ 				WHERE
+					a.board_cd = #{board_cd}
+				
+				) AA
+		
+			</select>
+	
+	<!-- 게시판 조회수 -->
+		<update id = "articlesReadcnt" parameterType="int">
+			UPDATE
+				articles
+			SET
+				read_cnt = read_cnt+1
+			WHERE
+				article_no = #{article_no}
+		</update>
+	
+	
+		<insert id="articlesInsert" parameterType="fp001_d001VO">
+		INSERT INTO articles
+		(
+			article_no
+			,board_cd
+			,local_no
+			,trans_no
+			,writer_id
+			,article_nm
+			,article_content
+			,read_cnt
+			,reg_date
+		)VALUES(
+			ARTICLES_SEQ.NEXTVAL
+			,#{board_cd}
+			,#{local_no}
+			,#{trans_no}
+			,#{writer_id}
+			,#{article_nm}
+			,#{article_content}
+			,0
+			,SYSDATE
+		)
+		
+		<selectKey keyProperty="article_no" resultType="int">
+			SELECT ARTICLES_SEQ.CURRVAL AS article_no FROM DUAL
+		</selectKey>	
+	</insert>
+	
+	
+	<select id="viewArticles" resultType="fp001_d001VO">
+	
+		SELECT
+			u.user_nm
+			,a.board_cd
+			,a.article_nm
+			,a.article_content
+			,a.article_no
+			,a.local_no
+			,a.trans_no
+			,a.writer_id
+			,(SELECT code_nm FROM standard_code WHERE group_id = '016' AND code_id = a.board_cd) AS board_nm <!-- 게시판 목록 - 지역 부분 출력 -->
+			,(SELECT code_nm FROM standard_code WHERE group_id = '020' AND code_id = a.local_no) AS local_nm <!-- 게시판 목록 - 지역 부분 출력 -->
+			,(SELECT code_nm FROM standard_code WHERE group_id = '017' AND code_id = a.trans_no) AS trans_nm <!-- 게시판 목록 - 카테고리 부분 출력 -->
+			,(SELECT stored_nm FROM article_files WHERE article_no = #{article_no}) AS img_nm
+			,a.read_cnt
+			,a.reg_date
+		FROM
+			articles a
+		INNER JOIN
+			users u
+		ON
+			a.WRITER_ID = u.USER_ID
+		WHERE
+			article_no = #{article_no}
+	</select>
+	
+	<delete id="deleteArticles">
+		DELETE
+			FROM
+				articles
+			WHERE
+				article_no = #{article_no}
+	</delete>
+	
+	<update id="updateArticles" parameterType="fp001_d001VO">
+		UPDATE
+			articles
+		SET
+			article_nm = #{article_nm}
+			,article_content = #{article_content}
+			,board_cd = #{board_cd}
+			,local_no = #{local_no}
+			,trans_no = #{trans_no}
+			,chg_date = SYSDATE
+		WHERE
+			article_no = #{article_no}
+	</update>
+	
+	<!-- 이미지 업데이트 -->
+	<update id="fileUpdate" parameterType="HashMap">
+		UPDATE
+			article_files
+		SET
+			original_nm = #{original_nm}
+			,stored_nm = #{stored_nm}
+			,file_size = #{file_size}
+		WHERE
+			article_no = #{article_no}
+	</update>
+	
+	<!-- 디비 글 정보 -->
+	<select id="contentArticles" resultType="fp001_d001VO" parameterType="int">
+		SELECT
+			article_content
+			,(SELECT stored_nm FROM article_files WHERE article_no = #{article_no}) AS img_nm
+		FROM
+			articles
+		WHERE
+			article_no = #{article_no}
+	</select>
+	
+	<!-- 농장 알림사항 -->
+
+	<select id="notifications" resultType="fp001_d001VO" parameterType="PagingVO">
+	SELECT
+			AAA.*
+		FROM(
+			SELECT
+				COUNT(*) OVER() AS TOTAL_COUNT,
+				AA.*
+			FROM(
+				SELECT
+					ROW_NUMBER() OVER (ORDER BY article_no DESC) RNUM,
+					a.article_no
+					,u.user_nm
+					,a.article_nm
+					,a.article_content
+					,a.reg_date
+					,a.read_cnt
+					,a.board_cd
+					,a.local_no <!-- 지역 -->
+					,(SELECT SUBSTR(code_nm,1,2) FROM standard_code WHERE group_id = '016' AND code_id = a.board_cd) AS board_nm <!-- 게시판 목록 - 카테고리 부분 출력 -->
+					,(SELECT code_nm FROM standard_code WHERE group_id = '020' AND code_id = a.local_no) AS local_nm <!-- 게시판 목록 - 지역 부분 출력 -->
+				FROM
+					articles a
+				INNER JOIN
+					users u
+				ON
+					a.writer_id = u.user_id
+ 				WHERE
+					a.board_cd = #{board_cd}
+				ORDER BY
+					article_no DESC
+			) AA
+		) AAA
+		WHERE
+			AAA.RNUM BETWEEN #{start} AND #{end}
+		</select>
+	
+	<!-- 채팅방 번호 가져오기 -->
+	<select id="roomId" parameterType="Hashmap" resultType="String">
+		SELECT ROOM_ID
+		FROM CHATROOM
+		WHERE (USER_ID_1 = #{writer_id} AND USER_ID_2 = #{user_id})
+			OR
+			  (USER_ID_1 = #{user_id} AND USER_ID_2 = #{writer_id})
+	</select>
+	<!--  채팅방 만들기 -->
+	<insert id="makeChatroom" parameterType="Hashmap">
+		INSERT INTO CHATROOM
+		(
+			ROOM_ID
+			,CREATE_DATE
+			,USER_ID_1
+			,USER_ID_2
+		)
+		VALUES
+		(
+			ROOM_ID_SEQ.NEXTVAL
+			,SYSDATE
+			,#{writer_id}
+			,#{user_id}
+		)
+		
+		<selectKey keyProperty="ROOM_ID" resultType="String">
+			SELECT ROOM_ID_SEQ.CURRVAL AS ROOM_ID FROM DUAL
+		</selectKey>	
+	</insert>
+	<!-- 메시지 저장 -->
+	<insert id="saveMessage" parameterType="Hashmap">
+		INSERT INTO MESSAGE
+		(
+			MSG_ID
+			,CONTENT
+			,SENDER_ID
+			,SEND_DATE
+			,ROOM_ID
+			,ISREAD
+		)
+		VALUES
+		(
+			MSG_ID_SEQ.NEXTVAL
+			,#{content}
+			,#{user_id}
+			,TO_DATE(#{send_date}, 'yyyy-mm-dd hh24:mi:ss')
+			,#{room_id}
+			,'N'
+		)
+	</insert>
+	<!-- 메시지 가져오기 -->
+	<select id="selectMsg" parameterType="String" resultType="Hashmap">
+		SELECT
+			MSG_ID
+			,CONTENT
+			,SENDER_ID
+			,TO_CHAR(SEND_DATE, 'mm.dd HH24:MI') AS SEND_DATE
+			,ROOM_ID
+			,ISREAD
+			,(SELECT USER_NM FROM USERS WHERE user_id = M.SENDER_ID) AS USER_NM
+		FROM MESSAGE M
+		WHERE ROOM_ID = #{room_id}
+		ORDER BY SEND_DATE
+	</select>
+	<!--  채팅방 목록 가져오기 -->
+	<select id="chatList" parameterType="String" resultType="Hashmap">
+		SELECT
+			ROOM_ID
+			,USER_ID_1
+			,USER_ID_2
+			,(SELECT USER_NM FROM USERS WHERE USER_ID = C.USER_ID_1) AS USER_NM_1
+			,(SELECT USER_NM FROM USERS WHERE USER_ID = C.USER_ID_2) AS USER_NM_2 
+			,(SELECT CONTENT FROM (SELECT * FROM MESSAGE ORDER BY SEND_DATE DESC) WHERE ROOM_ID = C.ROOM_ID AND ROWNUM = 1) AS LATEST_MESSAGE
+    		,(SELECT TO_CHAR(SEND_DATE, 'mm"월 "d"일"') FROM (SELECT * FROM MESSAGE ORDER BY SEND_DATE DESC) WHERE ROOM_ID = C.ROOM_ID AND ROWNUM = 1) AS LATEST_DATE
+		FROM CHATROOM C
+		WHERE USER_ID_1 = #{user_id} OR USER_ID_2 = #{user_id}
+	</select>
+	<!--  채팅방 참가자 가져오기 -->
+	<select id="chatUserList" parameterType="String" resultType="Hashmap">
+		SELECT
+			USER_ID_1
+			,USER_ID_2 
+			,(SELECT USER_NM FROM USERS U WHERE U.USER_ID = C.USER_ID_1) AS USER_NM_1
+			,(SELECT USER_NM FROM USERS U WHERE U.USER_ID = C.USER_ID_2) AS USER_NM_2
+		FROM CHATROOM C
+		WHERE ROOM_ID = #{room_id}
+	</select>
+	<!-- 이름가져오기 -->
+	<select id="userName" parameterType="String" resultType="String">
+		SELECT USER_NM
+		FROM USERS
+		WHERE USER_ID = #{writer_id}
+	</select>
+	<!-- 첨부파일 -->
+	<insert id="fileUpload" parameterType="HashMap">
+		INSERT INTO ARTICLE_FILES
+		(
+			BOARD_CD
+			,ARTICLE_NO
+			,ORIGINAL_NM
+			,STORED_NM
+			,FILE_SIZE
+		)
+		VALUES
+		(
+			#{board_cd}
+			,#{article_no}
+			,#{original_nm}
+			,#{stored_nm}
+			,#{file_size}
+		)
+	</insert>
+	
+</mapper>

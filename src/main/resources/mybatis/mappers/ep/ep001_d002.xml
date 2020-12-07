@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace="ep.ep001_d002">
+	<select id="selectGardenList" resultType="hashmap" parameterType="hashmap">
+		SELECT
+			G.garden_no
+			,G.garden_nm
+			,(SELECT CODE_NM FROM STANDARD_CODE WHERE GROUP_ID = 026 AND CODE_ID = (SELECT AREA_SIZE FROM FARMS F WHERE F.farm_no = G.farm_no)) AS AREA_SIZE
+		FROM 
+			GARDENS G
+		WHERE
+		 	farm_no = #{farm_no} AND IS_RENTAL = 'N'
+		 ORDER BY
+		 	GARDEN_NO
+	</select>
+</mapper>

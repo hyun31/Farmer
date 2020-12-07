@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace="ep.ep001_d004">
+	<select id="selectFarmList" resultType="Hashmap" parameterType="String">
+		SELECT FARM_NM, FARM_NO
+		FROM FARMS
+		WHERE FARM_NO IN (
+							SELECT FARM_NO
+							FROM GARDENS
+							WHERE CUST_ID = #{cust_id}
+						 )
+	</select>
+	
+	<select id="selectGardenList" resultType="Hashmap" parameterType="Hashmap">
+		SELECT GARDEN_NO, GARDEN_NM
+		FROM GARDENS
+		WHERE FARM_NO = #{farm_no} AND CUST_ID = #{cust_id}
+	</select>
+	
+	<select id="selectProduct" resultType="Hashmap" parameterType="Hashmap">
+		SELECT F.PROD_NO, P.PROD_NAME
+		FROM FARM_PRODUCTS F INNER JOIN PRODUCTS P ON F.PROD_NO = P.PROD_NO AND F.PROD_TYPE_CD = P.PROD_TYPE_CD
+		WHERE F.FARM_NO = #{farm_no} AND F.PROD_TYPE_CD = #{prod_type_cd}
+	</select>
+	
+	<select id="selectProdInfo" resultType="Hashmap" parameterType="Hashmap">
+		SELECT 
+			PROD_NO,
+			PROD_NAME,
+			PROD_PRICE,
+			PROD_TYPE_CD
+		FROM PRODUCTS
+		WHERE PROD_NO = #{prod_no} AND PROD_TYPE_CD = #{prod_type_cd}
+	</select>
+ </mapper>

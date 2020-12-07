@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace="area">
+	<select id="selectArea" resultType="hashmap">
+		SELECT 
+			area_group_id
+			,area_group_nm
+			,area_id
+			,area_nm
+			,code_order
+			,useyn
+		FROM
+			AREA_CODE
+		WHERE
+			area_group_id = #{group_id} and useyn = 'Y'
+		ORDER BY
+			code_order
+	</select>
+</mapper>

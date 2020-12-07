@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace="ep.ep001_d001">
+	<select id="selectFarmList" resultType="hashmap" parameterType="hashmap">
+		SELECT
+			ROWNUM 
+			,farm_nm
+			,farm_no
+			,farm_phone
+			,farmer_phone
+			,garden_cnt
+			,address 
+			,(SELECT COUNT(*) FROM GARDENS WHERE FARM_NO = f.farm_no AND IS_RENTAL = 'N') AS AVAILABLE
+		FROM 
+			farms f
+		WHERE
+		 	1=1
+		<if test="city != null and city != ''">
+			AND address LIKE '%' || #{city} || '%'
+		</if>
+		<if test="name != null and name != ''">
+			AND farm_nm LIKE '%' || #{name} || '%'
+		</if>
+	</select>
+	
+	<select id="selectFarmInfo" parameterType="String" resultType="Hashmap">
+		SELECT *
+		FROM FARMS
+		WHERE farm_no = #{farm_no}
+	</select>
+</mapper>

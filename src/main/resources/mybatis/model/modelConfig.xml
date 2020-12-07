@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration 	PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<typeAliases>
+		<typeAlias type="project.jp.jp001_d001.vo.Jp001_d001VO"  alias="jp001_d001VO" />
+		<typeAlias type="project.ip.ip001_d001.vo.Ip001_d001VO"  alias="Ip001_d001VO" />
+		<typeAlias type="project.standardCode.vo.StandardCodeVO" alias="StandardCodeVO" />
+		<typeAlias type="project.bp.bp001_d001.vo.Bp001_d001VO"  alias="bp001_d001VO" />
+		<typeAlias type="project.fp.fp001_d001.vo.Fp001_d001VO"  alias="fp001_d001VO" />
+		<typeAlias type="project.utils.paging.PagingVO" alias="PagingVO" />
+		<typeAlias type="project.hp.hp001_d001.vo.Reply1VO"      alias="Reply1VO" />
+		<typeAlias type="project.hp.hp001_d002.vo.Reply2VO"      alias="Reply2VO" />
+		<typeAlias type="project.hp.hp001_d003.vo.Reply3VO"      alias="Reply3VO" />
+		<typeAlias type="project.hp.hp001_d004.vo.Reply4VO"      alias="Reply4VO" />
+		<typeAlias type="project.hp.hp001_d006.vo.Reply6VO"      alias="Reply6VO" />
+		
+		<typeAlias type="project.hp.hp001_d001.vo.Hp001_d001VO"  alias="Hp001_d001VO" />
+		<typeAlias type="project.hp.hp001_d002.vo.Hp001_d002VO"  alias="Hp001_d002VO" />
+		<typeAlias type="project.hp.hp001_d003.vo.Hp001_d003VO"  alias="Hp001_d003VO" />
+		<typeAlias type="project.hp.hp001_d004.vo.Hp001_d004VO"  alias="Hp001_d004VO" />
+		<typeAlias type="project.hp.hp001_d005.vo.Hp001_d005VO"  alias="Hp001_d005VO" />
+		<typeAlias type="project.hp.hp001_d006.vo.Hp001_d006VO"  alias="Hp001_d006VO" />
+
+	</typeAliases> 
+</configuration>

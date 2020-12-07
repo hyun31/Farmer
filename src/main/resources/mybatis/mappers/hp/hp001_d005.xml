@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="hp001_d005">
+    
+    <insert id="register" parameterType="project.hp.hp001_d005.vo.Hp001_d005VO">
+    	INSERT INTO FARMS (
+    		FARM_NO,
+  			FARM_NM,
+  			ADDRESS,
+  			FARMER_ID,
+  			FARM_INTRO,
+  			APPLICATION_DATE,
+  			CONTRACT_DATE,
+  			EXPIR_DATE,
+  			ORG_FILE_NAME,
+  			FARM_PHONE,
+  			REJECT_REASON,
+  			AREA_SIZE,
+  			GARDEN_CNT,
+  			FARMER_EMAIL,
+  			CONTRACT_TERM,
+  			LAND_ORG_FILE_NAME,
+  			LAND_SAVE_FILE_NAME,
+  			LAND_FILE_SIZE,
+  			SAVE_FILE_NAME,
+  			FILE_SIZE,
+  			THUMBNAIL_NAME,
+  			APPROVAL_CD,
+  			POST_CODE,
+  			FARMER_PHONE
+    	) VALUES (
+    		#{farm_no},
+    		#{farm_nm},
+    		#{address},
+    		#{farmer_id},
+    		#{farm_intro},
+    		sysdate,
+    		sysdate,
+    		sysdate,
+    		#{org_file_name},
+    		#{farm_phone},
+    		#{reject_reason},
+    		#{area_size},
+    		0,
+    		#{farmer_email},
+    		#{contract_term},
+    		#{land_org_file_name},
+    		#{land_save_file_name},
+    		0,
+    		#{save_file_name},
+    		0,
+    		#{thumbnail_name},
+    		0,
+    		#{post_code},
+    		#{farmer_phone}
+    	)
+    </insert>
+    </mapper>
